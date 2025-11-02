@@ -15,6 +15,11 @@ class DiscoveryMap {
         this.dragStart = { x: 0, y: 0 };
         this.hoveredLocation = null;
         
+        // Performance optimization
+        this.renderRequested = false;
+        this.lastRenderTime = 0;
+        this.renderThrottle = 16; // ~60fps max
+        
         this.init();
     }
     
@@ -40,7 +45,7 @@ class DiscoveryMap {
         const container = document.getElementById('map-container');
         this.canvas.width = container.clientWidth;
         this.canvas.height = container.clientHeight;
-        this.render();
+        this.requestRender();
     }
     
     setupEventListeners() {
@@ -74,7 +79,7 @@ class DiscoveryMap {
             this.viewCenter.lat += dy / (this.scale * Math.pow(2, this.zoom - 10));
             
             this.dragStart = { x: e.clientX, y: e.clientY };
-            this.render();
+            this.requestRender();
         } else {
             // Check for hover
             this.checkHover(e.offsetX, e.offsetY);
@@ -104,7 +109,7 @@ class DiscoveryMap {
             this.viewCenter.lat += dy / (this.scale * Math.pow(2, this.zoom - 10));
             
             this.dragStart = { x: touch.clientX, y: touch.clientY };
-            this.render();
+            this.requestRender();
             e.preventDefault();
         }
     }
@@ -117,14 +122,22 @@ class DiscoveryMap {
         e.preventDefault();
         const delta = e.deltaY > 0 ? -0.5 : 0.5;
         this.zoom = Math.max(10, Math.min(18, this.zoom + delta));
-        this.render();
+        this.requestRender();
     }
     
     checkHover(x, y) {
         let foundHover = null;
         
+        // Only check visible locations for hover (performance optimization)
         for (const location of this.locations) {
             const pos = this.latLngToCanvas(location.lat, location.lng);
+            
+            // Skip if marker is off-screen (with margin)
+            if (pos.x < -50 || pos.x > this.canvas.width + 50 ||
+                pos.y < -50 || pos.y > this.canvas.height + 50) {
+                continue;
+            }
+            
             const distance = Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2));
             
             if (distance < 15) {
@@ -136,7 +149,7 @@ class DiscoveryMap {
         if (foundHover !== this.hoveredLocation) {
             this.hoveredLocation = foundHover;
             this.showLocationInfo(foundHover, x, y);
-            this.render();
+            this.requestRender();
         }
     }
     
@@ -170,15 +183,37 @@ class DiscoveryMap {
         return { x, y };
     }
     
+    requestRender() {
+        if (this.renderRequested) return;
+        
+        this.renderRequested = true;
+        requestAnimationFrame(() => {
+            const now = performance.now();
+            
+            // Throttle to ~60fps
+            if (now - this.lastRenderTime >= this.renderThrottle) {
+                this.render();
+                this.lastRenderTime = now;
+                this.renderRequested = false;
+            } else {
+                // Schedule another frame if throttled
+                this.renderRequested = false;
+                this.requestRender();
+            }
+        });
+    }
+    
     render() {
         // Clear canvas
         this.ctx.fillStyle = '#1a1a1a';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // Draw grid lines for reference
-        this.drawGrid();
+        // Draw grid lines for reference (only at higher zoom levels for performance)
+        if (this.zoom >= 12) {
+            this.drawGrid();
+        }
         
-        // Draw locations
+        // Draw locations with culling (only draw what's visible)
         this.locations.forEach(location => {
             this.drawLocation(location);
         });
@@ -190,37 +225,63 @@ class DiscoveryMap {
     }
     
     drawGrid() {
+        // Simplified grid drawing for better performance
         this.ctx.strokeStyle = '#2d2d2d';
         this.ctx.lineWidth = 1;
         
         const scaleFactor = this.scale * Math.pow(2, this.zoom - 10);
-        const gridSpacing = 0.01; // degrees
+        const gridSpacing = this.zoom >= 15 ? 0.001 : 0.01; // Adaptive grid density
+        
+        // Calculate visible bounds
+        const margin = 0.05; // degrees
+        const lngStart = this.viewCenter.lng - margin;
+        const lngEnd = this.viewCenter.lng + margin;
+        const latStart = this.viewCenter.lat - margin;
+        const latEnd = this.viewCenter.lat + margin;
+        
+        // Limit grid lines to reduce draw calls
+        const maxLines = 20;
+        let lineCount = 0;
         
         // Vertical lines
-        for (let lng = Math.floor(this.viewCenter.lng * 100) / 100 - 0.1; 
-             lng < this.viewCenter.lng + 0.1; 
+        for (let lng = Math.floor(lngStart * 100) / 100; 
+             lng <= lngEnd && lineCount < maxLines; 
              lng += gridSpacing) {
             const pos = this.latLngToCanvas(this.viewCenter.lat, lng);
-            this.ctx.beginPath();
-            this.ctx.moveTo(pos.x, 0);
-            this.ctx.lineTo(pos.x, this.canvas.height);
-            this.ctx.stroke();
+            if (pos.x >= 0 && pos.x <= this.canvas.width) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(pos.x, 0);
+                this.ctx.lineTo(pos.x, this.canvas.height);
+                this.ctx.stroke();
+                lineCount++;
+            }
         }
         
+        lineCount = 0;
         // Horizontal lines
-        for (let lat = Math.floor(this.viewCenter.lat * 100) / 100 - 0.1; 
-             lat < this.viewCenter.lat + 0.1; 
+        for (let lat = Math.floor(latStart * 100) / 100; 
+             lat <= latEnd && lineCount < maxLines; 
              lat += gridSpacing) {
             const pos = this.latLngToCanvas(lat, this.viewCenter.lng);
-            this.ctx.beginPath();
-            this.ctx.moveTo(0, pos.y);
-            this.ctx.lineTo(this.canvas.width, pos.y);
-            this.ctx.stroke();
+            if (pos.y >= 0 && pos.y <= this.canvas.height) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, pos.y);
+                this.ctx.lineTo(this.canvas.width, pos.y);
+                this.ctx.stroke();
+                lineCount++;
+            }
         }
     }
     
     drawLocation(location) {
         const pos = this.latLngToCanvas(location.lat, location.lng);
+        
+        // Culling: Skip markers outside viewport (with margin for hover detection)
+        const margin = 50;
+        if (pos.x < -margin || pos.x > this.canvas.width + margin ||
+            pos.y < -margin || pos.y > this.canvas.height + margin) {
+            return;
+        }
         
         // Determine color based on discovery state and type
         let fillColor;
@@ -381,7 +442,7 @@ class DiscoveryMap {
             this.viewCenter = { lat, lng };
         }
         
-        this.render();
+        this.requestRender();
         
         // Check for nearby locations to discover
         this.checkDiscoveries();
@@ -444,7 +505,7 @@ class DiscoveryMap {
             infoPanel.innerHTML = originalContent;
         }, 3000);
         
-        this.render();
+        this.requestRender();
     }
     
     updateStats() {
