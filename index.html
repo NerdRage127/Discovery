@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discovery Map</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Discovery Map</h1>
+            <div class="stats">
+                <span id="discovered-count">Discovered: 0</span>
+                <span id="total-count">Total: 0</span>
+            </div>
+        </header>
+        
+        <div id="map-container">
+            <canvas id="map"></canvas>
+            <div id="location-info" class="location-popup" style="display: none;"></div>
+        </div>
+        
+        <div class="legend">
+            <h3>Legend</h3>
+            <div class="legend-item">
+                <span class="legend-color undiscovered"></span>
+                <span>Undiscovered</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color discovered"></span>
+                <span>Discovered</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color private"></span>
+                <span>Private (Members Only)</span>
+            </div>
+        </div>
+        
+        <div id="info-panel">
+            <p>Move around to discover new places!</p>
+            <p>Private locations require actual visits to unlock.</p>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>

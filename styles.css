@@ -1,0 +1,163 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+header {
+    background-color: #2d2d2d;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+header h1 {
+    font-size: 1.5rem;
+    color: #4CAF50;
+}
+
+.stats {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.stats span {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    background-color: #3d3d3d;
+    border-radius: 4px;
+}
+
+#map-container {
+    flex: 1;
+    position: relative;
+    background-color: #1a1a1a;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+}
+
+#map:active {
+    cursor: grabbing;
+}
+
+.location-popup {
+    position: absolute;
+    background-color: rgba(45, 45, 45, 0.95);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    z-index: 999;
+    pointer-events: none;
+    max-width: 250px;
+}
+
+.location-popup h3 {
+    color: #4CAF50;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.location-popup p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+}
+
+.legend {
+    position: absolute;
+    bottom: 30px;
+    right: 10px;
+    background-color: rgba(45, 45, 45, 0.95);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.legend h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #4CAF50;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin: 0.5rem 0;
+    gap: 0.5rem;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+}
+
+.legend-color.undiscovered {
+    background-color: #333333;
+}
+
+.legend-color.discovered {
+    background-color: #4CAF50;
+}
+
+.legend-color.private {
+    background-color: #f44336;
+}
+
+#info-panel {
+    background-color: #2d2d2d;
+    padding: 1rem 2rem;
+    text-align: center;
+    border-top: 1px solid #3d3d3d;
+}
+
+#info-panel p {
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+    color: #aaaaaa;
+}
+
+
+
+/* Responsive design */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    
+    header h1 {
+        font-size: 1.2rem;
+    }
+    
+    .stats {
+        gap: 0.5rem;
+    }
+    
+    .legend {
+        bottom: 10px;
+        right: 10px;
+        padding: 0.75rem;
+    }
+}
