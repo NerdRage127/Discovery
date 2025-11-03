@@ -1,63 +1,60 @@
-# Discovery Map
+# Discovery Map - Road Explorer
 
-A web application that tracks your real-world location and reveals places on a map as you discover them in person.
+A web application that reveals roads and paths as you physically travel them, using real-time GPS tracking and OpenStreetMap data. Plan routes using roads you've already discovered and explore new areas.
 
 ## Features
 
-- **Interactive Map**: View your current location on a real-time map
-- **Discovery System**: All locations start as undiscovered (shown in gray/black)
-- **Visit Detection**: Locations are automatically discovered when you get within 100 meters
-- **Private Locations**: Gated communities, clubs, and other members-only places remain red until you actually visit them
-- **Persistent Progress**: Your discoveries are saved in local storage
-- **Real-time Tracking**: Continuous geolocation updates to track your movement
-- **Visual Indicators**:
-  - Gray/Black: Undiscovered locations
-  - Green: Discovered locations
-  - Red: Private locations (members only) - remain red until visited
+- **Real Map Overlay**: Uses OpenStreetMap tiles showing actual roads and geography
+- **Road Discovery**: Automatically highlights roads as you travel them via GPS tracking
+- **Travel Path Visualization**: See your journey as a green line on the map
+- **Route Planning**: Click on traveled roads to plan future exploration routes
+- **Distance Tracking**: Monitor total distance traveled
+- **Persistent Progress**: Your discovered roads and travel history are saved locally
+- **Real-time GPS Tracking**: Continuous location updates for accurate road discovery
+
+## Visual Indicators
+
+- **Gray/Faded**: Undiscovered roads (not yet traveled)
+- **Green**: Roads you've traveled with your travel path overlay
+- **Blue Dashed**: Planned route connecting selected road segments
+- **Orange Marker**: Your current location
 
 ## How It Works
 
-1. **Geolocation**: The app uses your browser's geolocation API to track your position
-2. **Distance Calculation**: When you move, the app calculates your distance to each location
-3. **Discovery**: If you're within 100 meters of a location, it's marked as discovered
-4. **Private Places**: Locations marked as "private" (gated communities, exclusive clubs) stay red on the map until you physically visit them, just like any other location
-5. **Progress Saving**: All discoveries are saved to your browser's local storage
+1. **GPS Tracking**: The app continuously monitors your location using high-accuracy GPS
+2. **Road Discovery**: When you travel on a road, it's automatically detected and marked as discovered
+3. **Path Recording**: Your travel path is drawn as a green line showing where you've been
+4. **Route Planning**: 
+   - Click "Plan Route" button to enter planning mode
+   - Click on any traveled road segments to add them to your route
+   - The app connects selected points with a blue dashed line
+   - Use planned routes to explore new areas and connect discovered roads
 
 ## Usage
 
-1. Open `index.html` in a web browser
+1. Open `index.html` in a modern web browser
 2. Grant location access when prompted
-3. Move around in the real world to discover new places
-4. Watch as the map updates with your discoveries!
+3. Start moving around - roads will be discovered automatically
+4. View your travel statistics in the header (distance traveled, roads discovered)
+5. Click "Plan Route" to create exploration routes from traveled roads
+6. Click "Clear Route" to remove your planned route
 
 ## Technical Details
 
-- **Frontend**: Pure HTML, CSS, and JavaScript
-- **Mapping Library**: Leaflet.js with CartoDB dark theme tiles
-- **Storage**: Browser localStorage for persistence
+- **Frontend**: HTML, CSS, and JavaScript (ES6+)
+- **Mapping**: Leaflet.js with OpenStreetMap tile layer
+- **Storage**: Browser localStorage for persistent progress
 - **Geolocation**: HTML5 Geolocation API with high accuracy mode
+- **Road Detection**: Grid-based proximity detection (can be enhanced with Overpass API for real road data)
 
-## Sample Locations
+## Future Enhancements
 
-The app includes sample locations in New York City:
-- Public places: Central Park, Times Square, Brooklyn Bridge, Metropolitan Museum, Grand Central Terminal
-- Private places: Elite Country Club, Luxury Gated Community, Exclusive Golf Club
-
-## Customization
-
-To add your own locations, edit the `locations` array in `app.js`:
-
-```javascript
-{
-    id: 9,
-    name: "Your Location",
-    lat: 40.7128,
-    lng: -74.0060,
-    type: "public", // or "private"
-    discovered: false,
-    description: "Description of your location"
-}
-```
+- Integration with OpenStreetMap Overpass API for actual road segment data
+- Road name display and identification
+- Route navigation with turn-by-turn directions
+- Export traveled routes as GPX files
+- Statistics dashboard with graphs and achievements
+- Social features to share discovered routes
 
 ## Browser Compatibility
 
@@ -65,7 +62,8 @@ Requires a modern browser with:
 - HTML5 Geolocation API support
 - localStorage support
 - ES6+ JavaScript support
+- SVG and Canvas support for map rendering
 
 ## Privacy
 
-All location data is stored locally in your browser. No data is sent to external servers.
+All location and travel data is stored locally in your browser. No data is sent to external servers except map tile requests to OpenStreetMap.
