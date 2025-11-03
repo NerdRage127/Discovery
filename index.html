@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discovery Map - Road Explorer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>🗺️ Discovery Map</h1>
+            <div class="stats">
+                <span id="distance-traveled">Distance: 0.0 km</span>
+                <span id="roads-discovered">Roads: 0</span>
+            </div>
+        </header>
+        
+        <div id="map"></div>
+        
+        <div class="controls">
+            <button id="route-mode-btn" class="btn-primary">
+                📍 Plan Route
+            </button>
+            <button id="clear-route-btn" class="btn-secondary" style="display: none;">
+                Clear Route
+            </button>
+        </div>
+        
+        <div class="legend">
+            <h3>Legend</h3>
+            <div class="legend-item">
+                <span class="legend-line undiscovered"></span>
+                <span>Undiscovered Roads</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-line discovered"></span>
+                <span>Traveled Roads</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-line planned"></span>
+                <span>Planned Route</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-marker current"></span>
+                <span>Your Location</span>
+            </div>
+        </div>
+        
+        <div id="info-panel">
+            <p>🚶 Move around to discover roads and explore new areas!</p>
+            <p>📍 Use Plan Route to select traveled roads and create your exploration path.</p>
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
